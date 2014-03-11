@@ -11,9 +11,8 @@ RUN wget -O /tmp/go-server.deb http://download01.thoughtworks.com/go/13.4.1/ga/g
 RUN dpkg -i /tmp/go-server.deb
 RUN rm /tmp/go-server.deb
 
-VOLUME ["/var/lib/go-server"]
-
 EXPOSE 8153
 EXPOSE 8154
 
 CMD ["/etc/init.d/go-server", "start"]
+CMD /etc/init.d/go-server start && tail -f /var/log/go-server/go-server.log
