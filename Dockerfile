@@ -1,18 +1,16 @@
-FROM ubuntu:13.10
-MAINTAINER Andrei Serdeliuc, andrei@apikot.com
+FROM debian:wheezy
+MAINTAINER Topper Bowers topper.bowers@vitals.com
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu saucy main universe" > /etc/apt/sources.list
-RUN apt-get -y update && apt-get -y upgrade
-RUN apt-get install -y wget openjdk-7-jre-headless curl unzip
+ADD wheezy-backports.list /etc/apt/sources.list.d/wheezy-backports.list
+
+RUN apt-get -y update && \
+        apt-get install -t wheezy-backports -y wget git procps openjdk-7-jre-headless curl unzip && \
+        apt-get clean
 
 ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
-RUN wget -O /tmp/go-server.deb http://download01.thoughtworks.com/go/13.4.1/ga/go-server-13.4.1-18342.deb
-RUN dpkg -i /tmp/go-server.deb
-RUN rm /tmp/go-server.deb
+#allow github pull to go smoothly
+ADD ssh/known_hosts /var/go/.ssh/known_hosts
+RUN chmod 644 /var/go/.ssh/known_hosts
 
-EXPOSE 8153
-EXPOSE 8154
 
-CMD ["/etc/init.d/go-server", "start"]
-CMD /etc/init.d/go-server start && tail -f /var/log/go-server/go-server.log
