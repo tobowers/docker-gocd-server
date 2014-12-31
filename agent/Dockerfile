@@ -22,11 +22,12 @@ RUN chmod +x /usr/local/bin/wrapdocker
 
 # Define additional metadata for our image.
 VOLUME /var/lib/docker
+
+RUN wget -O /tmp/go-client.deb http://download.go.cd/gocd-deb/go-agent-14.4.0-1356.deb && dpkg -i /tmp/go-client.deb && rm /tmp/go-client.deb
+
 VOLUME /var/lib/go-agent
 
 RUN sed -r -i "s/^(GO_SERVER)=(.*)/\1=\$SERVER_PORT_8153_TCP_ADDR/g" /etc/default/go-agent
 
-RUN wget -O /tmp/go-client.deb go-agent-14.4.0-1356.deb && dpkg -i /tmp/go-client.deb && rm /tmp/go-client.deb
-
-
+CMD /bootstrap_keys && /usr/local/bin/wrapdocker && /usr/lib/jvm/java-7-openjdk-amd64/bin/java -jar /usr/share/go-agent/agent-bootstrapper.jar $SERVER_PORT_8153_TCP_ADDR $SERVER_PORT_8153_TCP_PORT
 

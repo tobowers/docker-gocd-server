@@ -95,5 +95,4 @@ else
 	else
 		docker -d $DOCKER_DAEMON_ARGS &
 	fi
-	exec bash
 fi

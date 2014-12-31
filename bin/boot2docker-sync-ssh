@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# this lets you run an image with the following volume: -v /tmp/ssh-socket:/tmp/ssh-socket and have ssh port forwarding enabled
+
+DOCKER_IP=$(boot2docker ip 2>/dev/null)
+
+find ~/.ssh -maxdepth 1 -type f ! -name 'authorized_keys' ! -name 'config' -exec scp -o StrictHostKeyChecking=no -i ~/.ssh/id_boot2docker {} docker@${DOCKER_IP}:~/.ssh \;
+ssh -t -o StrictHostKeyChecking=no -i ~/.ssh/id_boot2docker docker@${DOCKER_IP} 'rm -rf /tmp/ssh-socket && eval `ssh-agent -a /tmp/ssh-socket` && ssh-add'
