@@ -1,13 +1,11 @@
-FROM debian:wheezy
+FROM centos:centos6
 MAINTAINER Topper Bowers topper.bowers@vitals.com
 
-ADD sources.list.d/wheezy-backports.list /etc/apt/sources.list.d/wheezy-backports.list
+RUN yum install -y initscripts postfix rsyslog sudo zip tar \
+    redhat-lsb-core rsync openssh-clients wget curl openssh-server unzip \
+    pcre-devel pcre git java-1.7.0-openjdk
 
-RUN apt-get -y update && \
-        apt-get install -t wheezy-backports -y wget git procps openjdk-7-jre-headless curl unzip && \
-        apt-get clean
-
-ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
+#ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
 ADD bootstrap_keys /bootstrap_keys
 RUN chmod 700 /bootstrap_keys

@@ -1,7 +1,9 @@
 FROM thdevops01.mdx.med:5000/gocd-base
 MAINTAINER Andrei Serdeliuc, andrei@apikot.com
 
-RUN wget -O /tmp/go-server.deb http://download.go.cd/gocd-deb/go-server-14.4.0-1356.deb && dpkg -i /tmp/go-server.deb && rm /tmp/go-server.deb
+RUN wget -O /tmp/go-server.rpm http://download.go.cd/gocd-rpm/go-server-14.4.0-1356.noarch.rpm && \
+    yum localinstall -y /tmp/go-server.rpm && \
+    rm /tmp/go-server.rpm
 
 EXPOSE 8153 8154
 
