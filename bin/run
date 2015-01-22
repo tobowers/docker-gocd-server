@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler'
+Bundler.setup
+
+require 'slop'
+
+PROJECT_ROOT = File.expand_path('../..', __FILE__)
+
+opts = Slop.parse(help: true) do
+  banner 'Usage: bin/run [options]'
+
+  on '-i', 'image', '(required) the base name of the image to run [server, agent]', argument: true
+  on '-k', 'key', '(optional) the path to the directory containing the gocd_rsa key, defaults to ~/.ssh', argument: :optional
+end
+
+IMAGE_BASE_NAME = 'thdevops01.mdx.med:5000'
+KEY_PATH = opts[:key] || File.expand_path('~/.ssh')
+
+case opts[:image]
+  when 'server'
+    exec("docker run -d -p 8153:8153 -v #{KEY_PATH}:/keys --name gocd-server #{IMAGE_BASE_NAME}/gocd-server")
+  when 'agent'
+    # the agent is running docker inside of itself so it needs to be privileged
+    exec("docker run --privileged --link=gocd-server:server -v #{KEY_PATH}:/keys --name=gocd-agent #{IMAGE_BASE_NAME}/gocd-agent")
+  else
+    raise "unrecognized image, only server and agent allowed"
+end

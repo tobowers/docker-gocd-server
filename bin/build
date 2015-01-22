@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler'
+Bundler.setup
+
+require 'slop'
+
+PROJECT_ROOT = File.expand_path('../..', __FILE__)
+
+opts = Slop.parse(help: true) do
+  banner 'Usage: bin/build [options]'
+
+  on '-i', 'image', '(required) the name of the image to build [base, server, agent]', argument: true
+end
+
+case opts[:image]
+  when 'base'
+    Dir.chdir(PROJECT_ROOT)
+    exec('docker build -t thdevops01.mdx.med:5000/gocd-base .')
+  when 'server'
+    Dir.chdir(File.join(PROJECT_ROOT, 'server'))
+    exec('docker build -t thdevops01.mdx.med:5000/gocd-server .')
+  when 'agent'
+    Dir.chdir(File.join(PROJECT_ROOT, 'agent'))
+    exec('docker build -t thdevops01.mdx.med:5000/gocd-agent .')
+  else
+    raise 'unknown image, only allowed base, server, agent'
+end
+
+
