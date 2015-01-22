@@ -13,6 +13,7 @@ ADD bootstrap_keys /bootstrap_keys
 RUN chmod 700 /bootstrap_keys
 
 #allow github pull to go smoothly
+VOLUME /var/go/.ssh
 ADD ssh/known_hosts /var/go/.ssh/known_hosts
 RUN chown -R 102:104 /var/go && chmod 700 /var/go/.ssh
 RUN chmod 644 /var/go/.ssh/known_hosts
