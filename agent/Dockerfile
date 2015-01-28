@@ -13,13 +13,23 @@ RUN wget https://get.docker.com/builds/Linux/x86_64/docker-1.4.1 -O /usr/bin/doc
 ADD ./wrapdocker /usr/local/bin/wrapdocker
 RUN chmod +x /usr/local/bin/wrapdocker
 
-# Define additional metadata for our image.
+# the docker daemon depends on not being inside the aufs - so we declare a volume
 VOLUME /var/lib/docker
 
-#ruby requirements
+# setup yum repos for node
+RUN curl -sL https://rpm.nodesource.com/setup | bash -
+
+#ruby requirements / node / phantomjs requirements
 RUN yum install -y gcc-c++ patch readline readline-devel zlib zlib-devel \
                    libyaml-devel libffi-devel openssl-devel make bzip2 \
-                   autoconf automake libtool bison
+                   autoconf automake libtool bison nodejs \
+                   fontconfig freetype libfreetype.so.6 libfontconfig.so.1 libstdc++.so.6 #this line is phantomjs dependencies
+
+#install phantomjs
+RUN wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.8-linux-x86_64.tar.bz2 -O /tmp/phantomjs-1.9.8-linux-x86_64.tar.bz2 && \
+    cd /tmp && tar xvf /tmp/phantomjs-1.9.8-linux-x86_64.tar.bz2 && \
+    cp /tmp/phantomjs-1.9.8-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs && \
+    rm /tmp/phantomjs-1.9.8-linux-x86_64.tar.bz2 && rm -rf /tmp/phantomjs-1.9.8-linux-x86_64/bin/phantomjs
 
 # install RVM, Ruby, and Bundler
 RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
@@ -46,5 +56,5 @@ RUN chown -R go:go /var/go/.profile.d && chmod 755 -R /var/go/.profile.d
 
 ENV DOCKER_DAEMON_ARGS="--insecure-registry thdevops01.mdx.med:5000" LOG=file
 
-CMD /bootstrap_keys && /usr/local/bin/wrapdocker && su - go -c '/usr/share/go-agent/agent.sh'
+CMD /bootstrap_keys && /usr/local/bin/wrapdocker && rm /var/lib/go-agent/.agent-bootstrapper.running && su - go -c 'eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa && /usr/share/go-agent/agent.sh'
 

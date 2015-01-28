@@ -5,6 +5,7 @@ require 'bundler'
 Bundler.setup
 
 require 'slop'
+require 'docker'
 
 PROJECT_ROOT = File.expand_path('../..', __FILE__)
 
@@ -18,6 +19,12 @@ end
 IMAGE_BASE_NAME = 'thdevops01.mdx.med:5000'
 KEY_PATH = opts[:key] || File.expand_path('~/.ssh/gocd')
 
+def is_created?(container_name)
+  Docker::Container.get(container_name)
+rescue Docker::Error::NotFoundError
+  nil
+end
+
 case opts[:image]
   when 'server'
     exec(<<-EOL)
@@ -27,6 +34,11 @@ case opts[:image]
                  --name gocd-server #{IMAGE_BASE_NAME}/gocd-server
     EOL
   when 'agent'
+
+    unless is_created?('gocd-agent-storage')
+      system("docker create --name=gocd-agent-storage #{IMAGE_BASE_NAME}/gocd-agent")
+    end
+
     # the agent is running docker inside of itself so it needs to be privileged
     host_opts = ['vagrant.mdx.med',
      'integration.vitalschoice.mdx.med',
@@ -36,7 +48,8 @@ case opts[:image]
     exec(<<-EOL)
       docker run --privileged \
                  --link=gocd-server:gocd-server \
-                 -v /lib/modules:/lib/modules \
+                 --volumes-from=gocd-agent-storage \
+                 -v /lib/modules:/lib/modules:ro \
                  -v #{KEY_PATH}:/keys:ro \
                  #{host_opts} \
                  --name=gocd-agent #{IMAGE_BASE_NAME}/gocd-agent

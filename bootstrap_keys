@@ -2,8 +2,8 @@
 
 if [ -d /keys ]
 then
-    cp /keys/id_rsa /var/go/.ssh/id_rsa
+    cp /keys/id_rsa* /var/go/.ssh/
     chown -R go:go /var/go/.ssh
-    chmod 600 /var/go/.ssh/id_rsa
+    chmod 600 /var/go/.ssh/id_rsa*
 fi
 
