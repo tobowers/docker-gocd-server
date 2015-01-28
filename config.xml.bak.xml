@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="74">
+  <server artifactsdir="artifacts" commandRepositoryLocation="default" serverId="31bbef75-b2ca-4345-a1d1-d0436ff579e7" />
+  <pipelines group="defaultGroup">
+    <pipeline name="platform-all" isLocked="false">
+      <materials>
+        <git url="git@github.com:mdx-dev/platform-all.git" branch="feature/docker" />
+      </materials>
+      <stage name="code-rspec">
+        <jobs>
+          <job name="code-rspec">
+            <tasks>
+              <exec command="bundle">
+                <arg>install</arg>
+                <arg>--path</arg>
+                <arg>vendor/bundle</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bundle">
+                <arg>exec</arg>
+                <arg>rspec</arg>
+                <arg>spec/lib</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="features">
+        <jobs>
+          <job name="rspec-features">
+            <tasks>
+              <exec command="bundle">
+                <arg>install</arg>
+                <arg>--path</arg>
+                <arg>vendor/bundle</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="bundle">
+                <arg>exec</arg>
+                <arg>rspec</arg>
+                <arg>spec/features</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <agents>
+    <agent hostname="86fa6a4d4e1b" ipaddress="10.1.42.1" uuid="c80b7304-fe31-4de2-a155-dbe64826f4bf" />
+    <agent hostname="c3ad8737b0fa" ipaddress="10.1.42.1" uuid="b26622c5-a2be-4b68-90e0-aae4856d385c" />
+  </agents>
+</cruise>
+

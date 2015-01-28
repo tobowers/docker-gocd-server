@@ -52,6 +52,7 @@ RUN sed -r -i "s/^(GO_SERVER)=(.*)/\1=\gocd-server/g" /etc/default/go-agent
 RUN sed -r -i "s/^(DAEMON)=(.*)/\1=\N/g" /etc/default/go-agent
 
 ADD profile.d/pgsql /var/go/.profile.d/pgsql
+ADD profile.d/nodepath /var/go/.profile.d/nodepath
 RUN chown -R go:go /var/go/.profile.d && chmod 755 -R /var/go/.profile.d
 
 ENV DOCKER_DAEMON_ARGS="--insecure-registry thdevops01.mdx.med:5000" LOG=file
