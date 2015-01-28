@@ -31,6 +31,7 @@ case opts[:image]
       docker run -p 8153:8153 \
                  -p 8154:8154 \
                  -v #{KEY_PATH}:/keys:ro \
+                 -d \
                  --name gocd-server #{IMAGE_BASE_NAME}/gocd-server
     EOL
   when 'agent'
@@ -52,6 +53,7 @@ case opts[:image]
                  -v /lib/modules:/lib/modules:ro \
                  -v #{KEY_PATH}:/keys:ro \
                  #{host_opts} \
+                 -d \
                  --name=gocd-agent #{IMAGE_BASE_NAME}/gocd-agent
     EOL
   else
